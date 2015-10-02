@@ -8,14 +8,21 @@ app = Flask(__name__)
 
 
 class GitHub(object):
-    def __init__(self, api_token, users):
+    def __init__(self, api_token, users, special_title, special_user):
         self.session = requests.Session()
         self.session.headers['Authorization'] = 'token %s' % api_token
         self.reviewers = users
+        self.title = special_title
+        self.user = special_user
 
     def set_assigned(self, issue):
         url = issue['url']
-        assignee = issue['number'] % len(self.reviewers)
+        title = issue['title']
+        if (self.title is not None) and (self.user is not None) and (self.title in title):
+            assignee = special_user
+        else:
+            assignee = issue['number'] % len(self.reviewers)
+
         body = '{{\n "assignee": "{}"\n}}'.format(self.reviewers[assignee])
         return self.session.patch(url, data=body)
 
@@ -39,6 +46,12 @@ except KeyError:
     print 'Exiting...'
     sys.exit(1)
 
+try:
+    special_title = os.environ['SPECIAL_TITLE']
+    special_user = os.environ['SPECIAL_USER']
+except KeyError:
+    special_title = None
+    special_user = None
 
 gh = GitHub(token, users)
 
