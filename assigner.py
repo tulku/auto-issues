@@ -19,11 +19,12 @@ class GitHub(object):
         url = issue['url']
         title = issue['title']
         if (self.title is not None) and (self.user is not None) and (self.title in title):
-            assignee = special_user
+            assignee = self.user
         else:
-            assignee = issue['number'] % len(self.reviewers)
+            assignee_index = issue['number'] % len(self.reviewers)
+            assignee = self.reviewers[assignee_index]
 
-        body = '{{\n "assignee": "{}"\n}}'.format(self.reviewers[assignee])
+        body = '{{\n "assignee": "{}"\n}}'.format(assignee)
         return self.session.patch(url, data=body)
 
 
