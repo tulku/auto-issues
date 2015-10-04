@@ -53,7 +53,7 @@ except KeyError:
     special_title = None
     special_user = None
 
-gh = GitHub(token, users)
+gh = GitHub(token, users, special_title, special_user)
 
 if __name__ == '__main__':
     app.run()
